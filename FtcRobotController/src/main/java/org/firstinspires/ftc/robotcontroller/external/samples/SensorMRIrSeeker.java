@@ -55,7 +55,7 @@ public class SensorMRIrSeeker extends LinearOpMode {
   @Override
   public void runOpMode() {
 
-    IrSeekerSensor irSeeker;    // Hardware Device Object
+    IrSeekerSensor irSeeker;    // org.firstinspires.ftc.teamcode.Hardware Device Object
 
     // get a reference to our GyroSensor object.
     irSeeker = hardwareMap.get(IrSeekerSensor.class, "sensor_ir");

@@ -56,7 +56,7 @@ public class SensorDigitalTouch extends LinearOpMode {
      * The lower (first) pin stays unconnected.*
      */
 
-    DigitalChannel digitalTouch;  // Hardware Device Object
+    DigitalChannel digitalTouch;  // org.firstinspires.ftc.teamcode.Hardware Device Object
 
     @Override
     public void runOpMode() {

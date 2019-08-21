@@ -72,9 +72,9 @@ public class HardwarePushbot
 
     }
 
-    /* Initialize standard Hardware interfaces */
+    /* Initialize standard org.firstinspires.ftc.teamcode.Hardware interfaces */
     public void init(HardwareMap ahwMap) {
-        // Save reference to Hardware map
+        // Save reference to org.firstinspires.ftc.teamcode.Hardware map
         hwMap = ahwMap;
 
         // Define and Initialize Motors

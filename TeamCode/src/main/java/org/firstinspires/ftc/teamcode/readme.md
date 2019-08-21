@@ -28,7 +28,7 @@ The prefix of the name will be one of the following:
 * Sensor:   This is a Sample OpMode that shows how to use a specific sensor.
             It is not intended as a functioning robot, it is simply showing the minimal code
             required to read and display the sensor values.
-* Hardware: This is not an actual OpMode, but a helper class that is used to describe
+* org.firstinspires.ftc.teamcode.Hardware: This is not an actual OpMode, but a helper class that is used to describe
             one particular robot's hardware devices: eg: for a Pushbot.  Look at any
             Pushbot sample to see how this can be used in an OpMode.
             Teams can copy one of these to create their own robot definition.

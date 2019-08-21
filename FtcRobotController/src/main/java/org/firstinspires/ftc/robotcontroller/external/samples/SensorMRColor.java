@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 @Disabled
 public class SensorMRColor extends LinearOpMode {
 
-  ColorSensor colorSensor;    // Hardware Device Object
+  ColorSensor colorSensor;    // org.firstinspires.ftc.teamcode.Hardware Device Object
 
 
   @Override

@@ -9,4 +9,6 @@ public class RobotValues {
     public static float KV = 1;
     public static float VELOCITY_FEEDFORWARD_GAIN;
     public static int WTFAREWEEVENDOING = 0;
+    public static int twentyTicksPerRev;
+    public static int distFromCenter;
 }

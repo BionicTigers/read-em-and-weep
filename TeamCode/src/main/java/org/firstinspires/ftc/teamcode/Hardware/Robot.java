@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Movement.Location;
 
@@ -42,7 +43,11 @@ public class Robot {
      * Constructor 1
      * @param type
      */
-    public Robot(RobotType type, Location loc){
+    public Robot(RobotType type, Location loc, HardwareMap hw){
+        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
+        Motor2 = (DcMotorEx) hw.dcMotor.get("forntLeft");
+        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
+        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
         robotType = type;
         robot = loc;
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1,Motor2,Motor3,Motor4));

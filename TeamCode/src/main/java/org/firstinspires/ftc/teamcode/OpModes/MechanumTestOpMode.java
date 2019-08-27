@@ -13,7 +13,5 @@ public class MechanumTestOpMode extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         drivetrain = new Mechanum(new Location(), hardwareMap);
         drivetrain.forwardInches(3);
-        drivetrain.turnDegrees(180);
-        drivetrain.forwardInches(3);
     }
 }

@@ -37,10 +37,10 @@ public class Robot {
      * @param type
      */
     public Robot(RobotType type, Location loc, HardwareMap hw) {
-        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
+        Motor1 = (DcMotorEx) hw.dcMotor.get("frontLeft");
         Motor2 = (DcMotorEx) hw.dcMotor.get("backLeft");
-        Motor3 = (DcMotorEx) hw.dcMotor.get("frontLeft");
-        Motor4 = (DcMotorEx) hw.dcMotor.get("backLeft");
+        Motor3 = (DcMotorEx) hw.dcMotor.get("frontRight");
+        Motor4 = (DcMotorEx) hw.dcMotor.get("backRight");
         robotType = type;
         robot = loc;
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3, Motor4));

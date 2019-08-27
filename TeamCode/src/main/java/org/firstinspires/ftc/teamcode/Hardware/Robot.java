@@ -45,9 +45,9 @@ public class Robot {
      */
     public Robot(RobotType type, Location loc, HardwareMap hw){
         Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
-        Motor2 = (DcMotorEx) hw.dcMotor.get("forntLeft");
-        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
-        Motor1 = (DcMotorEx) hw.dcMotor.get("forntLeft");
+        Motor2 = (DcMotorEx) hw.dcMotor.get("backLeft");
+        Motor3 = (DcMotorEx) hw.dcMotor.get("frontLeft");
+        Motor4 = (DcMotorEx) hw.dcMotor.get("backLeft");
         robotType = type;
         robot = loc;
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1,Motor2,Motor3,Motor4));
@@ -59,7 +59,7 @@ public class Robot {
         if (robotType == RobotType.DIFFY_MECH){
             for (DcMotorEx motorEx: driveMotors ){
                 motorEx.setPower(.5);
-                motorEx.setTargetPosition((int)((distance/(Math.PI*4)*RobotValues.twentyTicksPerRev)));
+                motorEx.setTargetPosition(motorEx.getCurrentPosition()+(int)((distance/(Math.PI*4)*RobotValues.twentyTicksPerRev)));
             }
         }
         else {

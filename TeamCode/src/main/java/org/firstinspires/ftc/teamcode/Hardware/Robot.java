@@ -54,7 +54,6 @@ public class Robot {
 
     public void forwardInches(double distance) throws UnsupportedOperationException {
         if (robotType == RobotType.DIFFY_MECH) {
-            if (!Motor1.isBusy()) {
                 for (DcMotorEx motorEx : driveMotors) {
                     motorEx.setPower(0);
                     motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) (distance / (4 * Math.PI) * RobotValues.twentyTicksPerRev));
@@ -62,11 +61,9 @@ public class Robot {
                 for (DcMotorEx motorEx : driveMotors) {
                     motorEx.setPower(.5);
                 }
-            }
         } else {
             throw new UnsupportedOperationException("This robot hasn't been coded yet. So go yell at chris or code it yourself ;)");
         }
-
     }
 
     public void turnDegrees(double degrees) throws UnsupportedOperationException {

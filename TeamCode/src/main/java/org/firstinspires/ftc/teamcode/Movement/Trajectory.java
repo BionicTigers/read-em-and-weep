@@ -82,7 +82,7 @@ public class Trajectory {
             }
         }
         float t4TotalDistance = (distance-(dist*2));
-        float t4DistanceTracker = 0;
+        float t4DistanceTracker = 0f;
         while(t4TotalDistance>t4DistanceTracker){
             distance+=velocity/1000f;
             dataHolder = new ArrayList<Float>();

@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.Hardware;
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Movement.Location;
+import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.RevBulkData;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -21,11 +26,21 @@ public class Robot {
     private DcMotorEx Motor6;
     private DcMotorEx Motor7;
     private DcMotorEx Motor8;
-    private int middleEncPos = 0;
+
+    RevBulkData bulkData;
+    AnalogInput a0, a1, a2, a3;
+    DigitalChannel d0, d1, d2, d3, d4, d5, d6, d7;
+    ExpansionHubMotor motor0, motor1, motor2, motor3;
+    ExpansionHubEx expansionHub;
+
     //Location of the bot
     private Location robot;
+    //Array of different types of things
     private ArrayList<DcMotorEx> driveMotors;
     private ArrayList<DcMotorEx> leftMotors;
+    //This array should go left encoder, right encoder, back encoder
+    private ArrayList<DcMotorEx> encoders;
+    private int[] encoderPosition = {0,0,0};
 
     /**
      * TODO add a function that checks the config.xml file
@@ -42,19 +57,34 @@ public class Robot {
         Motor2 = (DcMotorEx) hw.dcMotor.get("backLeft");
         Motor3 = (DcMotorEx) hw.dcMotor.get("frontRight");
         Motor4 = (DcMotorEx) hw.dcMotor.get("backRight");
+        expansionHub = hw.get(ExpansionHubEx.class, "Expansion Hub 2");
         robotType = type;
         robot = loc;
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3, Motor4));
         leftMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2));
         rightMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor3, Motor4));
+        encoders = new ArrayList<DcMotorEx>(Arrays.asList(Motor1,Motor2,Motor3));
         for (DcMotorEx motorEx : driveMotors) {
             motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motorEx.setTargetPositionTolerance(50);
         }
     }
+
+    /**
+     * TODO add something that periodically checks the camera
+     */
     public void updatePosition(){
-        double y = Motor5.get
-        robot.setLocation(y);
+        bulkData = expansionHub.getBulkInputData();
+        double[] encoderDeltamm = new double[3];
+        for(int i = 0;i<3;i++){
+           encoderDeltamm[i] =  RobotValues.odoDiamMM*Math.PI*((encoderPosition[i]-bulkData.getMotorCurrentPosition(i))/RobotValues.twentyTicksPerRev);
+           encoderPosition[i]=bulkData.getMotorCurrentPosition(i);
+        }
+        double botRotDelta = (encoderDeltamm[0]-encoderDeltamm[1])/RobotValues.odoDistBetweenMM;
+        double robotXDelta = encoderDeltamm[2]-RobotValues.middleOdoFromMiddleMM*botRotDelta;
+        double robotYDelta = (encoderDeltamm[0]-encoderDeltamm[1])/2;
+        robot.translateLocal(robotYDelta,robotXDelta,botRotDelta);
+
     }
 
     public void forwardInches(double distance) throws UnsupportedOperationException {
@@ -99,9 +129,6 @@ public class Robot {
 
 
     }
-    public int deltaMiddleTicks() {
-        double delta = Motor5.getCurrentPosition() - centerTicks;
-        middleEncPos
-        return Motor5.getCurrentPosition() - centerTicks;
-    }
+
+
 }

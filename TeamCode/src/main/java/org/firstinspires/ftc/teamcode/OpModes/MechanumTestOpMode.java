@@ -12,7 +12,9 @@ public class MechanumTestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         drivetrain = new Mechanum(new Location(), hardwareMap);
+        BetterOpMode op = new BetterOpMode();
         waitForStart();
+        drivetrain.
         drivetrain.forwardInches(3);
         while(!isStopRequested()){}
     }

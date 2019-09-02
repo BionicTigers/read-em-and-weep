@@ -21,6 +21,7 @@ public class Robot {
     private DcMotorEx Motor6;
     private DcMotorEx Motor7;
     private DcMotorEx Motor8;
+    private int middleEncPos = 0;
     //Location of the bot
     private Location robot;
     private ArrayList<DcMotorEx> driveMotors;
@@ -46,21 +47,25 @@ public class Robot {
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3, Motor4));
         leftMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2));
         rightMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor3, Motor4));
-        for(DcMotorEx motorEx: driveMotors){
+        for (DcMotorEx motorEx : driveMotors) {
             motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motorEx.setTargetPositionTolerance(50);
         }
     }
+    public void updatePosition(){
+        double y = Motor5.get
+        robot.setLocation(y);
+    }
 
     public void forwardInches(double distance) throws UnsupportedOperationException {
         if (robotType == RobotType.DIFFY_MECH) {
-                for (DcMotorEx motorEx : driveMotors) {
-                    motorEx.setPower(0);
-                    motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) (distance / (4 * Math.PI) * RobotValues.twentyTicksPerRev));
-                }
-                for (DcMotorEx motorEx : driveMotors) {
-                    motorEx.setPower(.5);
-                }
+            for (DcMotorEx motorEx : driveMotors) {
+                motorEx.setPower(0);
+                motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) (distance / (4 * Math.PI) * RobotValues.twentyTicksPerRev));
+            }
+            for (DcMotorEx motorEx : driveMotors) {
+                motorEx.setPower(.5);
+            }
         } else {
             throw new UnsupportedOperationException("This robot hasn't been coded yet. So go yell at chris or code it yourself ;)");
         }
@@ -93,5 +98,10 @@ public class Robot {
         DIFFY_MECH
 
 
+    }
+    public int deltaMiddleTicks() {
+        double delta = Motor5.getCurrentPosition() - centerTicks;
+        middleEncPos
+        return Motor5.getCurrentPosition() - centerTicks;
     }
 }

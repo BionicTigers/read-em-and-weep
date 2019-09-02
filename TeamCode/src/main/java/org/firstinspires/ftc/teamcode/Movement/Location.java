@@ -70,6 +70,9 @@ public class Location {
         pos[2] = z;
         pos[3] = rot % 360;
     }
+    public void setLocation(float y) {
+        setLocation(pos[0], y, pos[2],pos[3]);
+    }
 
     /**
      * Sets location to input.

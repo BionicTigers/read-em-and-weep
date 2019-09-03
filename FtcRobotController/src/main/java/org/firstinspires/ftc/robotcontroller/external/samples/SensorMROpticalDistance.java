@@ -46,7 +46,7 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 @Disabled
 public class SensorMROpticalDistance extends LinearOpMode {
 
-  OpticalDistanceSensor odsSensor;  // Hardware Device Object
+  OpticalDistanceSensor odsSensor;  // org.firstinspires.ftc.teamcode.Hardware Device Object
 
   @Override
   public void runOpMode() {

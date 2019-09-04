@@ -70,6 +70,9 @@ public class Location {
         pos[2] = z;
         pos[3] = rot % 360;
     }
+    public void setLocation(float y) {
+        setLocation(pos[0], y, pos[2],pos[3]);
+    }
 
     /**
      * Sets location to input.
@@ -99,7 +102,7 @@ public class Location {
      * @param forward Translates position given units forward.
      */
     public void translateLocal(float forward) {
-        translateLocal(forward, 0f);
+        translateLocal(forward, 0f,0f);
     }
 
     /**
@@ -108,8 +111,10 @@ public class Location {
      *
      * @param forward Translates position given units forward.
      * @param right   Translates position given units right.
+     * @param deltaRotRad translates rotation in given units Radian
      */
-    public void translateLocal(float forward, float right) {
+    public void translateLocal(double forward, double right, double deltaRotRad) {
+        this.setRotation(this.getLocation(3)+(float) Math.toDegrees(deltaRotRad));
         translateLocal(forward, 0f, right);
     }
 
@@ -125,6 +130,10 @@ public class Location {
         pos[0] += (float) (forward * Math.cos(Math.toRadians(pos[3])) + right * Math.cos(Math.toRadians(pos[3] - 90)));
         pos[1] += up;
         pos[2] += (float) (forward * Math.sin(Math.toRadians(pos[3])) + right * Math.sin(Math.toRadians(pos[3] - 90)));
+    }
+    public void openGLTranslateLocal(float forward, float right, float rot){
+
+        setLocation(new OpenGLMatrix(new float[]{right,forward,0,(float ) Math.toDegrees(rot)}));
     }
 
     /**

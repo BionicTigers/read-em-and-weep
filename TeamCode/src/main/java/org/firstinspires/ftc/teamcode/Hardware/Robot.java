@@ -1,109 +1,112 @@
 package org.firstinspires.ftc.teamcode.Hardware;
 
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-
-
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
-
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ReadWriteFile;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.Movement.Location;
-
+import org.openftc.revextensions2.ExpansionHubEx;
+import org.openftc.revextensions2.ExpansionHubMotor;
+import org.openftc.revextensions2.RevBulkData;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A class for all movement methods (using PID and IMU) for Rover Ruckus for autonomous as well as mechanisms methods for autonomous as well
  * (Basically an autonomous base)
  */
 public class Robot {
-
+    public RobotType robotType;
+    public Orientation angles;
+    public int gameState = 0;
+    public float beepbeep = 0;
+    RevBulkData bulkData;
+    AnalogInput a0, a1, a2, a3;
+    DigitalChannel d0, d1, d2, d3, d4, d5, d6, d7;
+    ExpansionHubMotor motor0, motor1, motor2, motor3;
+    ExpansionHubEx expansionHub;
+    BNO055IMU imu;
+    //Declaration of our 8 DC motors
+    protected DcMotorEx Motor1;
+    protected DcMotorEx Motor2;
+    protected DcMotorEx Motor3;
+    protected DcMotorEx Motor4;
+    protected DcMotorEx Motor5;
+    protected DcMotorEx Motor6;
+    protected DcMotorEx Motor7;
+    protected DcMotorEx Motor8;
+    //Location of the bot
+    protected Location robot;
+    //Array of different types of things
+    protected ArrayList<DcMotorEx> driveMotors;
+    protected ArrayList<DcMotorEx> leftMotors;
+    //This array should go left encoder, right encoder, back encoder
+    private ArrayList<DcMotorEx> encoders;
+    private int[] encoderPosition = {0, 0, 0};
     //-----tweak values-----//
     //private float maximumMotorPower = 0.5f;             //when executing a goToLocation function, robot will never travel faster than this value (percentage 0=0%, 1=100%)
     private float encoderCountsPerRev = 1120f;         //encoder ticks per one revolution
     private boolean useTelemetry;                       //whether to execute the telemetry method while holding
     private float minVelocityCutoff = 0.06f;            //velocity with which to continue program execution during a hold (encoder ticks per millisecond)
-
-
-
-
-
     //-----misc internal values-----//
     private com.qualcomm.robotcore.eventloop.opmode.LinearOpMode hardwareGetter;
     private org.firstinspires.ftc.robotcore.external.Telemetry telemetry;
-
     private DcMotor velocityMotor;
     private long prevTime;
     private int prevEncoder;
     private float velocity = 0f;
-
     private float wheelDistance = 6.66f;                //distance from center of robot to center of wheel (inches)
     private float wheelDiameter = 4;                //diameter of wheel (inches)
 
-    BNO055IMU imu;
-    public Orientation angles;
-    private Location pos = new Location();
-    public int gameState = 0;
-
     //location of robot as [x,y,z,rot] (inches / degrees)
-
+    private Location pos = new Location();
     //-----motors-----//
     private DcMotor frontLeft;
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
-
-    public float beepbeep = 0;
-
-
-
-
     /**
-     * The constructor class for Navigation
+     * Sets all drive motor run modes to given mode.
      *
-     * @param hardwareGetter - The OpMode required to access motors. Often, 'this' will suffice.
-     * @param telemetry      - Telemetry of the current OpMode, used to output data to the screen.
-     * @param useTelemetry   - Whether or not to output information about stored variables and motors during hold periods.
+     * @param mode name DcMotor mode to given value.
      */
-    public Robot(com.qualcomm.robotcore.eventloop.opmode.LinearOpMode hardwareGetter, org.firstinspires.ftc.robotcore.external.Telemetry telemetry, boolean useTelemetry) {
-        this.hardwareGetter = hardwareGetter;
+    protected ArrayList<DcMotorEx> rightMotors;
+
+
+    public Robot(RobotType type, Telemetry telemetry, Location loc, HardwareMap hw) {
         this.telemetry = telemetry;
-        this.useTelemetry = useTelemetry;
+        Motor1 = (DcMotorEx) hw.dcMotor.get("frontLeft");
+        Motor2 = (DcMotorEx) hw.dcMotor.get("backLeft");
+        Motor3 = (DcMotorEx) hw.dcMotor.get("frontRight");
+        Motor4 = (DcMotorEx) hw.dcMotor.get("backRight");
+        expansionHub = hw.get(ExpansionHubEx.class, "Expansion Hub 2");
+        robotType = type;
+        robot = loc;
 
-
-
-
-        //-----motors-----//
-        frontLeft = hardwareGetter.hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareGetter.hardwareMap.dcMotor.get("frontRight");
-        backLeft = hardwareGetter.hardwareMap.dcMotor.get("backLeft");
-        backRight = hardwareGetter.hardwareMap.dcMotor.get("backRight");
-        driveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
-
-
-        //-----velocity control-----//
-        velocityMotor = frontLeft;
-        prevTime = System.currentTimeMillis();
-        prevEncoder = velocityMotor.getCurrentPosition();
-
-        //---imu initialization-----//
+        driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3, Motor4));
+        leftMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2));
+        rightMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor3, Motor4));
+        encoders = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3));
+        for (DcMotorEx motorEx : driveMotors) {
+            motorEx.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motorEx.setTargetPositionTolerance(50);
+        }
         BNO055IMU.Parameters noots = new BNO055IMU.Parameters();
         noots.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         noots.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -113,11 +116,14 @@ public class Robot {
         noots.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareGetter.hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(noots);
-
-
     }
 
 
+    double round(double value) { //Allows telemetry to display nicely
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(3, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
     /**
      * Sets drive motor powers.
@@ -126,10 +132,18 @@ public class Robot {
      * @param right power of right two motors as percentage (0-1).
      */
     public void drivePower(float left, float right) {
-        frontLeft.setPower(left);
-        frontRight.setPower(right);
-        backRight.setPower(right);
-        backLeft.setPower(left);
+        Motor1.setPower(left);
+        Motor2.setPower(right);
+        Motor3.setPower(right);
+        Motor4.setPower(left);
+    }
+    public void drivePower(float[] powers) throws InvalidParameterException{
+        if(powers.length != 4)
+            throw new InvalidParameterException("BOI YOUR ARRAY NEEDS TO HAVE 4 VALUES");
+        int i = 0;
+        for (DcMotorEx motorEx: driveMotors){
+            motorEx.setPower(i); i++;
+        }
     }
 
     /**
@@ -145,16 +159,24 @@ public class Robot {
         backLeft.setTargetPosition(left);
     }
 
-    /**
-     * Sets all drive motor run modes to given mode.
-     *
-     * @param mode name DcMotor mode to given value.
-     */
+    public void updatePosition() {
+        bulkData = expansionHub.getBulkInputData();
+        double[] encoderDeltamm = new double[3];
+        for (int i = 0; i < 3; i++) {
+            encoderDeltamm[i] = RobotValues.odoDiamMM * Math.PI * ((encoderPosition[i] - bulkData.getMotorCurrentPosition(i)) / RobotValues.twentyTicksPerRev);
+            encoderPosition[i] = bulkData.getMotorCurrentPosition(i);
+        }
+        double botRotDelta = (encoderDeltamm[0] - encoderDeltamm[1]) / RobotValues.odoDistBetweenMM;
+        double robotXDelta = encoderDeltamm[2] - RobotValues.middleOdoFromMiddleMM * botRotDelta;
+        double robotYDelta = (encoderDeltamm[0] - encoderDeltamm[1]) / 2;
+        robot.translateLocal(robotYDelta, robotXDelta, botRotDelta);
+
+    }
+
     public void driveMode(DcMotor.RunMode mode) {
-        frontLeft.setMode(mode);
-        frontRight.setMode(mode);
-        backRight.setMode(mode);
-        backLeft.setMode(mode);
+        for(DcMotorEx motorEx: driveMotors){
+            motorEx.setMode(mode);
+        }
     }
 
     /**
@@ -165,107 +187,21 @@ public class Robot {
         driveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
-    /**
-     * Pseudo PID to drive the given distance.
-     *
-     * @param distance Distance to drive forward in inches.
-     */
-    public void goDistance(float distance, float maximumMotorPower, float maxiumMotorPower) {
-        driveMethodSimple(-distance, distance, maximumMotorPower, maximumMotorPower);
-        pos.translateLocal(distance);
-    }
 
-    /**
-     * Same as goDistance() e.g. PID drive in a straight line, but with a holdForDrive() at the end. I'm not sure. Just roll with it.
-     *
-     * @param distance Distance to drive forward in inches.
-     */
 
-    public void goDistanceHold(float distance) {
-        goDistance(distance, 0.7f, 0.7f);
-        holdForDrive();
-    }
-
-    /**
-     * Executes a point turn to face the given world rotation.
-     *
-     * @param rot Target azimuth in degrees
-     */
-    public void pointTurn(float rot) {
-        float rota = (rot - pos.getLocation(3)) % 360f;
-        float rotb = -(360f - rota);
-        float optimalRotation = (Math.abs(rota) < Math.abs(rotb) ? rota : rotb); //selects shorter rotation
-        float distance = (float) (Math.toRadians(optimalRotation) * wheelDistance); //arc length of turn (radians * radius)
-        driveMethodSimple(distance, distance, 0.3f, 0.3f);
-
-        pos.setRotation(rot);
-    }
-
-//    if(potentiometer.getVoltage() < desiredPosition){
-//
-//    }
-//    else if(potentiometer.getVoltage() > desiredPosition){
-//         }
-
-    /**
-     * Executes a point turn to face the given Location.
-     *
-     * @param loc Target Location object
-     */
-    public void pointTurn(Location loc) {
-        pointTurn((float) Math.toDegrees(Math.atan2(loc.getLocation(2) - pos.getLocation(2), loc.getLocation(0) - pos.getLocation(0))));
-    }
-
-    /**
-     * Executes a point turn relative to the current location. Positive is counterclockwise.
-     *
-     * @param rot the amount to rotate the robot in degrees. Positive is counterclockwise.
-     */
-    public void pointTurnRelative(float rot) {
-        pointTurn(pos.getLocation(3) + rot);
-    }
-
-    /**
-     * Executes a point turn to the given heading, first updating the position with the internal IMU value. Will holdForDrive() automatically.
-     *
-     * @param heading Target rotation in degrees.
-     */
-    public void pointTurnIMU(float heading) {
-        pos.setRotation((imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES)).firstAngle);
-        pointTurn(heading);
-        holdForDrive();
-    }
-
-    /**
-     * Drive method that independently controls the position and power of the left and right drive motors.
-     *
-     * @param distanceL float. Distance in inches for left motors to traverse.
-     * @param distanceR float. Distance in inches for right motors to traverse.
-     * @param LPower    float. Power percentage for left motors (0.0-1.0).
-     * @param RPower    float. Power percentage for right motors (0.0-1.0).
-     */
-    private void driveMethodSimple(float distanceL, float distanceR, float LPower, float RPower) {
-        driveMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        int l = (int) (distanceL / (wheelDiameter * Math.PI) * encoderCountsPerRev);
-        int r = (int) (distanceR / (wheelDiameter * Math.PI) * encoderCountsPerRev);
-        drivePosition(-l, -r);
-        drivePower(LPower, RPower);
-        driveMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
+    @Deprecated
     /**
      * Holds program execution until drive motor velocities are below the minimum cutoff.
      * Will output telemetry if class initialized with useTelemetry true.
+     *
      */
-    public void holdForDrive() {
+    protected void holdForDrive() {
         hold(0.2f);
         gameState++;
         while (updateVelocity() > minVelocityCutoff && hardwareGetter.opModeIsActive()) {
             if (useTelemetry) telemetryMethod();
         }
     }
-
-
 
     /**
      * Hold program for given number of seconds.
@@ -279,6 +215,7 @@ public class Robot {
             if (useTelemetry) telemetryMethod();
         }
     }
+    @Deprecated
 
     /**
      * Updates the stored velocity of the robot to reflect reality.
@@ -301,17 +238,8 @@ public class Robot {
         telemetry.addData("Game State = ", gameState);
         String motorString = "FL = " + frontLeft.getCurrentPosition() + " BL = " + backLeft.getCurrentPosition() + " FR = " + frontRight.getCurrentPosition() + " BR = " + backRight.getCurrentPosition();
         telemetry.addData("Drive = ", motorString);
-
         telemetry.addData("Pos = ", pos);
         telemetry.addData("Velocity = ", velocity);
-
-        //telemetry.addData("Pot",percentTurned())
-
-
-        //   telemetry.addData("CubeXPosition",detector.getXPosition());
-
-
-
         telemetry.update();
     }
 
@@ -354,9 +282,20 @@ public class Robot {
         return Math.abs(heading - angles.firstAngle) < err;
     }
 
-    private static double round(double value) { //Allows telemetry to display nicely
-        BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(3, RoundingMode.HALF_UP);
-        return bd.doubleValue();
+
+
+
+
+    /**
+     * TODO add more constructors at different levels of control
+     */
+    public enum RobotType {
+        BOARD,
+        LUCY_6W_DRIVE,
+        DIFFY_MECH
+
+
     }
+
+
 }

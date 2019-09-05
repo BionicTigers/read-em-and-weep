@@ -18,7 +18,7 @@ public class Mechanum extends Robot{
      * @param loc
      */
     public Mechanum(Location loc, Telemetry telemetry, HardwareMap hw) {
-        super(RobotType.DIFFY_MECH, telemetry, loc,hw);
+        super(telemetry, loc,hw);
     }
 
     /**
@@ -36,7 +36,7 @@ public class Mechanum extends Robot{
     }
     public void turnDegrees(double degrees) throws UnsupportedOperationException {
         if (!Motor1.isBusy() && !Motor4.isBusy()) {
-            if (robotType == RobotType.DIFFY_MECH) {
+
                 for (DcMotorEx motorEx : leftMotors) {
                     motorEx.setPower(.5);
                     motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) (RobotValues.distFromCenter * 2 * Math.PI * (degrees / 360)));
@@ -46,18 +46,10 @@ public class Mechanum extends Robot{
                     motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) -(RobotValues.distFromCenter * 2 * Math.PI * (degrees / 360)));
                 }
             }
-        } else {
-            throw new UnsupportedOperationException("This robot hasn't been coded yet. So go yell at chris or code it yourself ;)");
-        }
 
     }
-    public void pointTurnIMU(float heading) {
-        pos.setRotation((imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES)).firstAngle);
-        pointTurn(heading);
-        holdForDrive();
-    }
     public void forwardInches(double distance) throws UnsupportedOperationException {
-        if (robotType == RobotType.DIFFY_MECH) {
+
             for (DcMotorEx motorEx : driveMotors) {
                 motorEx.setPower(0);
                 motorEx.setTargetPosition(motorEx.getTargetPosition() + (int) (distance / (4 * Math.PI) * RobotValues.twentyTicksPerRev));
@@ -65,9 +57,6 @@ public class Mechanum extends Robot{
             for (DcMotorEx motorEx : driveMotors) {
                 motorEx.setPower(.5);
             }
-        } else {
-            throw new UnsupportedOperationException("This robot hasn't been coded yet. So go yell at chris or code it yourself ;)");
-        }
     }
 
 }

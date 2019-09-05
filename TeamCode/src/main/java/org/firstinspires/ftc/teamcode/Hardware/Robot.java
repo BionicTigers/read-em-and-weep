@@ -32,7 +32,6 @@ import java.util.Arrays;
  * (Basically an autonomous base)
  */
 public class Robot {
-    public RobotType robotType;
     public Orientation angles;
     public int gameState = 0;
     public float beepbeep = 0;
@@ -89,14 +88,13 @@ public class Robot {
     protected ArrayList<DcMotorEx> rightMotors;
 
 
-    public Robot(RobotType type, Telemetry telemetry, Location loc, HardwareMap hw) {
+    public Robot(Telemetry telemetry, Location loc, HardwareMap hw) {
         this.telemetry = telemetry;
         Motor1 = (DcMotorEx) hw.dcMotor.get("frontLeft");
         Motor2 = (DcMotorEx) hw.dcMotor.get("backLeft");
         Motor3 = (DcMotorEx) hw.dcMotor.get("frontRight");
         Motor4 = (DcMotorEx) hw.dcMotor.get("backRight");
         expansionHub = hw.get(ExpansionHubEx.class, "Expansion Hub 2");
-        robotType = type;
         robot = loc;
 
         driveMotors = new ArrayList<DcMotorEx>(Arrays.asList(Motor1, Motor2, Motor3, Motor4));
@@ -286,16 +284,7 @@ public class Robot {
 
 
 
-    /**
-     * TODO add more constructors at different levels of control
-     */
-    public enum RobotType {
-        BOARD,
-        LUCY_6W_DRIVE,
-        DIFFY_MECH
 
-
-    }
 
 
 }
